@@ -36,10 +36,10 @@ def draw_fractal(res, canvas):
     for i in range(0, len(res)):
         for j in range(0, len(res[i])):
             color = int(rescale(res[i][j], 0, 50, 0, 256))
-            paint_pixel(rescale(j, 0, len(res[i]), 0, 600), rescale(i, 0, len(res), 0, 400), (color, color, color), canvas)
+            paint_pixel(rescale(i, 0, len(res[i]), 0, 600), rescale(j, 0, len(res), 0, 400), (color, color, color), canvas)
                 
 def f(z):
-    return z*z + complex(-0.70176 , -0.3842)
+    return z*z + complex(-0.8 , 0.156)
 
 def rescale(value, min_a, max_a, min_b, max_b):
     a = max_a - min_a
@@ -57,7 +57,7 @@ def main():
     canvas = Canvas(root, width=root.winfo_screenwidth(), height=root.winfo_screenheight(), bg='white')
     canvas['bg'] = 'white'
 
-    res = constructIteratedMatrix(f, complex(-1, 1), complex(1, -1), 300, 50)
+    res = constructIteratedMatrix(f, complex(-1.5, 1.5), complex(1.5, -1.5), 300, 50)
     draw_fractal(res, canvas)
 
     canvas.pack()
