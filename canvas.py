@@ -1,9 +1,16 @@
-from tkinter import*
+from OpenGL.GL import * 
+from OpenGL.GLU import * 
+from OpenGL.GLUT import *
+
 import random
 import math
 
-def paint_pixel(x, y, canvas):
-    canvas.create_line(x, y, x+1, y+1, fill='white', width=1)
+
+def paint_pixel(x, y):
+    glBegin(GL_POINTS)
+    glVertex2f(x, y)
+    glEnd()
+
 
 def draw_fractal(res, canvas):
     for i in range(0, len(res)):
@@ -18,18 +25,34 @@ def rescale(value, min_a, max_a, min_b, max_b):
     value = float(value - min_a)/float(a)
     return min_b + (value * b)
 
-def main():
-    root = Tk()
-    root.geometry('600x400+0+0')
-    root.title("jFractalization")
-    root['bg'] = 'white'
-    root.resizable(False, False)
-    
-    canvas = Canvas(root, width=root.winfo_screenwidth(), height=root.winfo_screenheight(), bg='white')
-    canvas['bg'] = 'black'
 
-    canvas.pack()
-    root.mainloop()
+def create_window():
+    pass
+
+def iterate():
+    glViewport(0, 0, 500,500)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(0.0, 500, 0.0, 500, 0.0, 1.0)
+    glMatrixMode (GL_MODELVIEW)
+    glLoadIdentity()
+
+def showScreen():
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glLoadIdentity()
+    iterate()
+    glColor3f(1.0, 0.0, 3.0)
+    paint_pixel(100, 100)
+    glutSwapBuffers()
 
 if __name__ == "__main__":
-    main()
+    glutInit(sys.argv)
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB)
+    
+    glutInitWindowSize(600, 480)
+    glutInitWindowPosition(0, 0)
+    window = glutCreateWindow(b"jFractalization")
+
+    glutDisplayFunc(showScreen)
+    glutIdleFunc(showScreen)
+    glutMainLoop()
