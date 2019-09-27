@@ -1,12 +1,25 @@
+#openGL
 from OpenGL.GL import * 
 from OpenGL.GLU import * 
 from OpenGL.GLUT import *
+from OpenGL.GLUT.freeglut import *
+import OpenGL.GLUT.freeglut
 
+#other
 import random
 import math
+import datetime
+
+#:)
+import math_logic
 
 windowWidth = 640
 windowHeight = 480
+
+leftCorner = complex(-1.5, 1.5)
+rightCorner = complex(1.5, -1.5)
+density = 100
+iterations = 100
 
 def paint_pixel(x, y):
     glBegin(GL_POINTS)
@@ -39,15 +52,62 @@ def iterate():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 
-def showScreen(res = 0):
+def show_fractal():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     iterate()
     glColor3f(1.0, 0.0, 3.0)
-    if res != 0:
-        draw_fractal(res)
+    draw_fractal(res)
     glutSwapBuffers()
+    print(datetime.datetime.now())
+
+def show_screen():
+    pass
+
+'''
+def resize(width, height):
+    glutReshapeWindow(windowWidth, windowHeight)
+    show_fractal()
+    
+'''
+
+'''
+def mouseFunc(button, state, x, y):
+    print(button, " ", state, " ", x, " ", y)
+    
+'''
+
+def zoom(x, y, out):
+    global leftCorner
+    global rightCorner
+    global res
+    global density
+
+    x -= windowWidth/2;
+    y -= windowHeight/2;
+    
+    if out:
+        leftCorner *= 1.1
+        rightCorner *= 1.1
+        density *= 0.9
+    else:
+        leftCorner *= 0.9
+        rightCorner *= 0.9
+        density *= 1.1
+
+    res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
+    show_fractal()
+    
+
+def mouseWheelFunc(button, direction, x, y):
+    if direction == -1:
+        zoom(x, y, True)
+    else:
+        zoom(x, y, False)
 
 if __name__ == "__main__":
+    print(datetime.datetime.now())
+    res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
+    print(datetime.datetime.now())
     glutInit(sys.argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB)
     
@@ -55,6 +115,11 @@ if __name__ == "__main__":
     glutInitWindowPosition(0, 0)
     window = glutCreateWindow(b"jFractalization")
 
-    glutDisplayFunc(showScreen)
-    glutIdleFunc(showScreen(res))
+    glutDisplayFunc(show_fractal)
+    glutIdleFunc(show_screen)
+
+    glutMouseWheelFunc(mouseWheelFunc)
+    
+    #glutMouseFunc(mouseFunc)
+    #glutReshapeFunc(resize)
     glutMainLoop()
