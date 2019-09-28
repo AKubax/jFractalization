@@ -29,4 +29,4 @@ def constructIteratedMatrix(f, upperLeft, lowerRight, density, n):
 
 
 def f(z):
-    return z*(z-1)*(z+1)
+    return z*z - 1
