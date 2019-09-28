@@ -1,9 +1,9 @@
-import cmath
 import math
+'''
 import pandas
 import seaborn
 import matplotlib
-
+'''
 
 def iterate(f, z0, n):
     res = z0
@@ -30,7 +30,9 @@ def constructIteratedMatrix(f, upperLeft, lowerRight, density, n):
 
     return res
         
-            
+
+#primitive plotting:
+'''            
 def heatmapIteratedMatrix(mat, upperLeft, lowerRight, density):
     modMat = []
     for i in range(len(mat)):
@@ -41,7 +43,6 @@ def heatmapIteratedMatrix(mat, upperLeft, lowerRight, density):
     seaborn.heatmap(pandas.DataFrame(modMat, index = [upperLeft.imag - float(i) / density for i in range(int((upperLeft.imag - lowerRight.imag) * density) + 1)], columns = [upperLeft.real + float(i) / density for i in range(int((upperLeft.imag - lowerRight.imag) * density) + 1)]))
     matplotlib.pyplot.show()
 
-'''
 def func(z):
 	return z * (z - 1) * (z + 1)
 
