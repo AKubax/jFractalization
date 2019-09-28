@@ -27,8 +27,9 @@ rightCorner = complex(1.5, -1.5)
 density = 100
 iterations = 100
 
-scaleX = windowWidth/leftCorner.real
-scaleY = windowHeight/leftCorner.imag
+scaleX = abs(windowWidth/leftCorner.real)
+scaleY = abs(windowHeight/leftCorner.imag)
+cornerDelta = rightCorner - leftCorner
 
 def paint_pixel(x, y):
     glBegin(GL_POINTS)
@@ -101,6 +102,7 @@ def zoom(x, y, out):
 
     global scaleX
     global scaleY
+    global cornerDelta
 
     tempx = x
     tempy = y
@@ -127,32 +129,35 @@ def zoom(x, y, out):
 
     #deltaX = abs(leftCorner.real - rightCorner.real)
     #deltaY = abs(leftCorner.imag - rightCorner.imag)
-
     
     
     if out:
         density *= 0.9
-        leftCorner -= complex(50*current_zoom/scaleX, 50*current_zoom/scaleY)
-        rightCorner += complex(50*current_zoom/scaleX, 50*current_zoom/scaleY)
         temp_zoom += 50*current_zoom
         current_zoom *= 0.9
     else:
         density *= 1.1
-        leftCorner += complex(50*current_zoom/scaleX, 50*current_zoom/scaleY)
-        rightCorner -= complex(50*current_zoom/scaleX, 50*current_zoom/scaleY)
         temp_zoom -= 50*current_zoom
         current_zoom *= 1.1
-
+        
     #deltaX /= (windowWidth-2*temp_zoom)/windowWidth
     #deltaY /= (windowHeight-2*temp_zoom*windowWidth/windowHeight)/windowHeight
+
+    leftCorner = complex((screen_center.real - windowWidth/2)/scaleX * windowWidth/(windowWidth - 2*temp_zoom), -(screen_center.imag - windowHeight/2)/scaleY * windowHeight/(windowHeight-2*(temp_zoom/windowWidth * windowHeight)))
+    rightCorner = complex((screen_center.real + windowWidth/2)/scaleX * windowWidth/(windowWidth - 2*temp_zoom), -(screen_center.imag + windowHeight/2)/scaleY * windowHeight/(windowHeight-2*(temp_zoom/windowWidth * windowHeight)))
+
+    
+    print()
+    print(leftCorner)
+    print(rightCorner)
+    print()
     
     if temp_zoom <= -500 or temp_zoom >= 50:
         temp_zoom = 0
-        leftCorner += complex_center
-        rightCorner += complex_center
         screen_center = complex(0, 0)
         complex_center = complex(0, 0)
         res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
+        print("draw^^^^^")
         
     show_fractal()
     
