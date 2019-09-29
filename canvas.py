@@ -16,20 +16,22 @@ import math_logic
 windowWidth = 640
 windowHeight = 480
 
-current_zoom = 1
 temp_zoom = 0
+current_scale = 1
 
 screen_center = complex(0, 0)
 complex_center = complex(0, 0)
 
 leftCorner = complex(-1.5, 1.5)
 rightCorner = complex(1.5, -1.5)
-density = 100
+lreal = leftCorner.real
+density = 10
 iterations = 100
 
-scaleX = abs(windowWidth/leftCorner.real)
-scaleY = abs(windowHeight/leftCorner.imag)
+scaleX = abs(windowWidth/abs(leftCorner.real - rightCorner.real))
+scaleY = abs(windowHeight/abs(leftCorner.imag - rightCorner.imag))
 cornerDelta = rightCorner - leftCorner
+
 
 def paint_pixel(x, y):
     glBegin(GL_POINTS)
@@ -39,12 +41,10 @@ def paint_pixel(x, y):
 
 def draw_fractal(res):
     #global current_zoom
-    widthParam = temp_zoom
-    heightParam = temp_zoom/windowWidth * windowHeight
     for i in range(0, len(res)):
         for j in range(0, len(res[i])):
             if not math.isnan(res[i][j].real):
-                paint_pixel(rescale(i, 0, len(res[i]), widthParam-screen_center.real, windowWidth-widthParam-screen_center.real), rescale(j, 0, len(res), heightParam-screen_center.imag, windowHeight-heightParam-screen_center.imag))
+                paint_pixel(rescale(i, 0, len(res[i]), 0, windowWidth), rescale(j, 0, len(res), 0, windowHeight))
                 
 
 def rescale(value, min_a, max_a, min_b, max_b):
@@ -94,73 +94,50 @@ def zoom(x, y, out):
     global rightCorner
     global res
     global density
-    global current_zoom
     global temp_zoom
+    global lreal
+    global current_scale
 
-    global screen_center
-    global complex_center
+    lreal = abs(lreal)
 
-    global scaleX
-    global scaleY
-    global cornerDelta
-
-    tempx = x
-    tempy = y
-    
-    x -= windowWidth/2
-    y -= windowHeight/2
-    x += screen_center.real
-    y += screen_center.imag
-
-    screen_center = complex((screen_center.real+x)/2, (screen_center.imag+y)/2)
-
-    x = tempx
-    y = tempy
-
-    x -= windowWidth/2
-    y -= windowHeight/2
-    
-    x *= abs(leftCorner.real - rightCorner.real)/windowWidth
-    x += complex_center.real
-    y *= abs(leftCorner.imag - rightCorner.imag)/windowHeight
-    y += complex_center.imag
-
-    complex_center = complex((complex_center.real+x)/2, -(complex_center.imag+y)/2)
-
-    #deltaX = abs(leftCorner.real - rightCorner.real)
-    #deltaY = abs(leftCorner.imag - rightCorner.imag)
-    
-    
     if out:
-        density *= 0.9
-        temp_zoom += 50*current_zoom
-        current_zoom *= 0.9
+        current_scale /= 0.9
     else:
-        density *= 1.1
-        temp_zoom -= 50*current_zoom
-        current_zoom *= 1.1
-        
-    #deltaX /= (windowWidth-2*temp_zoom)/windowWidth
-    #deltaY /= (windowHeight-2*temp_zoom*windowWidth/windowHeight)/windowHeight
+        current_scale *= 0.9
 
-    leftCorner = complex((screen_center.real - windowWidth/2)/scaleX * windowWidth/(windowWidth - 2*temp_zoom), -(screen_center.imag - windowHeight/2)/scaleY * windowHeight/(windowHeight-2*(temp_zoom/windowWidth * windowHeight)))
-    rightCorner = complex((screen_center.real + windowWidth/2)/scaleX * windowWidth/(windowWidth - 2*temp_zoom), -(screen_center.imag + windowHeight/2)/scaleY * windowHeight/(windowHeight-2*(temp_zoom/windowWidth * windowHeight)))
-
+    widthParam = (leftCorner.real + rightCorner.real)/2
+    heightParam = (leftCorner.imag + rightCorner.imag)/2
+    leftCorner = complex(widthParam - lreal*current_scale, heightParam + lreal*current_scale)
+    rightCorner = complex(widthParam + lreal*current_scale, heightParam - lreal*current_scale)
     
-    print()
-    print(leftCorner)
-    print(rightCorner)
-    print()
-    
-    if temp_zoom <= -500 or temp_zoom >= 50:
+    if temp_zoom <= -500 or temp_zoom >= 50 or True:
         temp_zoom = 0
-        screen_center = complex(0, 0)
-        complex_center = complex(0, 0)
         res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
-        print("draw^^^^^")
         
     show_fractal()
     
+def keyboardFunc(key, x, y):
+    global leftCorner
+    global rightCorner
+    global res
+    global current_scale
+    #current_scale = abs(leftCorner.real/lreal)
+    
+    if key == b'w':
+        leftCorner = complex(leftCorner.real, leftCorner.imag + 0.1*current_scale)
+        rightCorner = complex(rightCorner.real, rightCorner.imag + 0.1*current_scale)
+    elif key == b's':
+        leftCorner = complex(leftCorner.real, leftCorner.imag - 0.1*current_scale)
+        rightCorner = complex(rightCorner.real, rightCorner.imag - 0.1*current_scale)
+    elif key == b'a':
+        leftCorner = complex(leftCorner.real - 0.1*current_scale, leftCorner.imag)
+        rightCorner = complex(rightCorner.real - 0.1*current_scale, rightCorner.imag)
+    elif key == b'd':
+        leftCorner = complex(leftCorner.real + 0.1*current_scale, leftCorner.imag)
+        rightCorner = complex(rightCorner.real + 0.1*current_scale, rightCorner.imag)
+    print(key)
+    res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
+    show_fractal()
 
 def mouseWheelFunc(button, direction, x, y):
     if direction == -1:
@@ -182,6 +159,7 @@ if __name__ == "__main__":
     glutDisplayFunc(show_fractal)
     glutIdleFunc(show_screen)
 
+    glutKeyboardFunc(keyboardFunc)
     glutMouseWheelFunc(mouseWheelFunc)
     
     #glutMouseFunc(mouseFunc)
