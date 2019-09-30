@@ -122,6 +122,8 @@ class cnumber:
         return self + (-z)
 
     def __mul__(self, z):
+        decimal.setcontext(decimal.ExtendedContext)
+        
         if self.is_nan() or z.is_nan(): return cnumber.NaN
         if self.is_inf() or z.is_inf():
             if not (self.is_zero() or z.is_zero()): return cnumber.Infinity
@@ -141,8 +143,13 @@ class cnumber:
         else: return cnumber( (self.Re * z.Re + self.Im * z.Im) / (z.Re * z.Re + z.Im * z.Im),
                              (self.Im * z.Re - self.Re * z.Im) / (z.Re * z.Re + z.Im * z.Im))
 
+    def __abs__(self):
+        return decimal.Decimal.sqrt(self.Re ** 2 + self.Im ** 2)
+
     def exp(z):
         return cnumber(u_cos(z.Im), u_sin(z.Im)) * cnumber(u_exp(z.Re))
+
+    
         
 
 
