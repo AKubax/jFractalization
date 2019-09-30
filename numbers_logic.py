@@ -129,6 +129,8 @@ class cnumber:
             if not (self.is_zero() or z.is_zero()): return cnumber.Infinity
             else: return cnumber.NaN
 
+        if self.Re * z.Re == decimal.Decimal('Infinity') or self.Im * z.Im == decimal.Decimal('Infinity') or self.Re * z.Im == decimal.Decimal('Infinity') or self.Im * z.Re == decimal.Decimal('Infinity'): return cnumber.Infinity
+
         return cnumber(self.Re * z.Re - self.Im * z.Im, self.Re * z.Im + self.Im * z.Re)
 
     def __truediv__(self, z):
