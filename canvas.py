@@ -13,25 +13,15 @@ import datetime
 #:)
 import math_logic
 
-windowWidth = 640
-windowHeight = 480
+windowWidth = 200
+windowHeight = 200
 
-temp_zoom = 0
-current_scale = 1
-
-screen_center = complex(0, 0)
 complex_center = complex(0, 0)
 
 leftCorner = complex(-1.5, 1.5)
 rightCorner = complex(1.5, -1.5)
-lreal = leftCorner.real
-density = 10
+density = 200
 iterations = 100
-
-scaleX = abs(windowWidth/abs(leftCorner.real - rightCorner.real))
-scaleY = abs(windowHeight/abs(leftCorner.imag - rightCorner.imag))
-cornerDelta = rightCorner - leftCorner
-
 
 def paint_pixel(x, y):
     glBegin(GL_POINTS)
@@ -40,7 +30,6 @@ def paint_pixel(x, y):
 
 
 def draw_fractal(res):
-    #global current_zoom
     for i in range(0, len(res)):
         for j in range(0, len(res[i])):
             if not math.isnan(res[i][j].real):
@@ -94,50 +83,39 @@ def zoom(x, y, out):
     global rightCorner
     global res
     global density
-    global temp_zoom
-    global lreal
-    global current_scale
+    global complex_center
 
-    lreal = abs(lreal)
+    x -= windowWidth/2
+    y -= windowHeight/2
 
     if out:
-        current_scale /= 0.9
+        density *= 0.8
+        x *= -1
     else:
-        current_scale *= 0.9
+        density *= 1.2
+        y *= -1
 
-    widthParam = (leftCorner.real + rightCorner.real)/2
-    heightParam = (leftCorner.imag + rightCorner.imag)/2
-    leftCorner = complex(widthParam - lreal*current_scale, heightParam + lreal*current_scale)
-    rightCorner = complex(widthParam + lreal*current_scale, heightParam - lreal*current_scale)
+    x *= abs(leftCorner.real - rightCorner.real)/windowWidth
+    y *= abs(leftCorner.imag - rightCorner.imag)/windowHeight
     
-    if temp_zoom <= -500 or temp_zoom >= 50 or True:
-        temp_zoom = 0
-        res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
+    x += complex_center.real
+    y += complex_center.imag
+    
+    complex_center = complex((complex_center.real + x)/2, (complex_center.imag + y)/2)
+    print(density)
+    leftCorner = complex(complex_center.real - windowWidth/(2*density), complex_center.imag + windowHeight/(2*density))
+    rightCorner = complex(complex_center.real + windowWidth/(2*density), complex_center.imag - windowHeight/(2*density))
+
+    res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
         
     show_fractal()
     
-def keyboardFunc(key, x, y):
-    global leftCorner
-    global rightCorner
-    global res
-    global current_scale
-    #current_scale = abs(leftCorner.real/lreal)
-    
-    if key == b'w':
-        leftCorner = complex(leftCorner.real, leftCorner.imag + 0.1*current_scale)
-        rightCorner = complex(rightCorner.real, rightCorner.imag + 0.1*current_scale)
-    elif key == b's':
-        leftCorner = complex(leftCorner.real, leftCorner.imag - 0.1*current_scale)
-        rightCorner = complex(rightCorner.real, rightCorner.imag - 0.1*current_scale)
-    elif key == b'a':
-        leftCorner = complex(leftCorner.real - 0.1*current_scale, leftCorner.imag)
-        rightCorner = complex(rightCorner.real - 0.1*current_scale, rightCorner.imag)
-    elif key == b'd':
-        leftCorner = complex(leftCorner.real + 0.1*current_scale, leftCorner.imag)
-        rightCorner = complex(rightCorner.real + 0.1*current_scale, rightCorner.imag)
+def keyboardFunc(key, x, y):    
+    if key == b'e':
+        zoom(x, y, False)
+    elif key == b'q':
+        zoom(x, y, True)
     print(key)
-    res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
-    show_fractal()
 
 def mouseWheelFunc(button, direction, x, y):
     if direction == -1:
