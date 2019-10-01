@@ -20,7 +20,7 @@ complex_center = complex(0, 0)
 
 leftCorner = complex(-1.5, 1.5)
 rightCorner = complex(1.5, -1.5)
-density = 200
+density = 50
 iterations = 100
 
 def paint_pixel(x, y):
@@ -125,6 +125,8 @@ def mouseWheelFunc(button, direction, x, y):
 
 if __name__ == "__main__":
     print(datetime.datetime.now())
+    leftCorner = complex(complex_center.real - windowWidth/(2*density), complex_center.imag + windowHeight/(2*density))
+    rightCorner = complex(complex_center.real + windowWidth/(2*density), complex_center.imag - windowHeight/(2*density))
     res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
     print(datetime.datetime.now())
     glutInit(sys.argv)
