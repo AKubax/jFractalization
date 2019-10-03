@@ -11,16 +11,18 @@ import math
 import datetime
 
 #:)
-import math_logic
+import mandel_logic
 
-windowWidth = 200
-windowHeight = 200
+windowWidth = 1280
+windowHeight = 720
+
+crit = 4
 
 complex_center = complex(0, 0)
 
 leftCorner = complex(-1.5, 1.5)
 rightCorner = complex(1.5, -1.5)
-density = 200
+density = 600
 iterations = 100
 
 def paint_pixel(x, y):
@@ -106,7 +108,7 @@ def zoom(x, y, out):
     leftCorner = complex(complex_center.real - windowWidth/(2*density), complex_center.imag - windowHeight/(2*density))
     rightCorner = complex(complex_center.real + windowWidth/(2*density), complex_center.imag + windowHeight/(2*density))
 
-    res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
+    res = mandel_logic.constructIteratedMatrix(leftCorner, rightCorner, density, iterations, crit)
         
     show_fractal()
     
@@ -125,7 +127,7 @@ def mouseWheelFunc(button, direction, x, y):
 
 if __name__ == "__main__":
     print(datetime.datetime.now())
-    res = math_logic.constructIteratedMatrix(math_logic.f, leftCorner, rightCorner, density, iterations)
+    res = mandel_logic.constructIteratedMatrix(leftCorner, rightCorner, density, iterations, crit)
     print(datetime.datetime.now())
     glutInit(sys.argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB)
