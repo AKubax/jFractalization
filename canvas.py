@@ -11,6 +11,7 @@ import math
 import datetime
 
 #:)
+from numbers_logic import cnumber
 import mandel_logic
 
 windowWidth = 1280
@@ -18,10 +19,10 @@ windowHeight = 720
 
 crit = 4
 
-complex_center = complex(0, 0)
+cnumber_center = cnumber(0, 0)
 
-leftCorner = complex(-1.5, 1.5)
-rightCorner = complex(1.5, -1.5)
+leftCorner = cnumber(-1.5, -1.5)
+rightCorner = cnumber(1.5, 1.5)
 density = 600
 iterations = 100
 
@@ -34,7 +35,7 @@ def paint_pixel(x, y):
 def draw_fractal(res):
     for i in range(0, len(res)):
         for j in range(0, len(res[i])):
-            if not math.isnan(res[i][j].real):
+            if not math.isnan(res[i][j]):
                 paint_pixel(rescale(i, 0, len(res[i]), 0, windowWidth), rescale(j, 0, len(res), 0, windowHeight))
                 
 
@@ -97,16 +98,16 @@ def zoom(x, y, out):
         density *= 1.2
         y *= -1
 
-    x *= abs(leftCorner.real - rightCorner.real)/windowWidth
-    y *= abs(leftCorner.imag - rightCorner.imag)/windowHeight
+    x *= abs(leftCorner.Re - rightCorner.Re)/windowWidth
+    y *= abs(leftCorner.Im - rightCorner.Im)/windowHeight
     
-    x += complex_center.real
-    y += complex_center.imag
+    x += complex_center.Re
+    y += complex_center.Im
     
-    complex_center = complex((complex_center.real + x)/2, (complex_center.imag + y)/2)
+    complex_center = cnumber((complex_center.Re + x)/2, (complex_center.Im + y)/2)
     print(density)
-    leftCorner = complex(complex_center.real - windowWidth/(2*density), complex_center.imag - windowHeight/(2*density))
-    rightCorner = complex(complex_center.real + windowWidth/(2*density), complex_center.imag + windowHeight/(2*density))
+    leftCorner = cnumber(complex_center.Re - windowWidth/(2*density), complex_center.Im - windowHeight/(2*density))
+    rightCorner = cnumber(complex_center.Re + windowWidth/(2*density), complex_center.Im + windowHeight/(2*density))
 
     res = mandel_logic.constructIteratedMatrix(leftCorner, rightCorner, density, iterations, crit)
         
